@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chaco Explorer | Agencia de Viajes</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIINfQWBsa0p1SQa1lrWvfGe5I5gbhD6tnA=" crossorigin="" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="background-shape shape-one"></div>
+  <div class="background-shape shape-two"></div>
+
+  <section id="authScreen" class="welcome-screen" aria-labelledby="authTitle">
+    <div class="welcome-card auth-card">
+      <div class="auth-logo-box">
+        <img src="assets/chaco-explorer-logo.png" alt="Logo Chaco Explorer" class="auth-logo">
+      </div>
+
+      <span class="welcome-badge">🌿 Chaco Explorer</span>
+      <h2 id="authTitle">Acceso al sistema</h2>
+      <p id="authDescription">
+        Inicia sesión con tu cuenta o crea una nueva para explorar destinos turísticos del Gran Chaco.
+      </p>
+
+      <div class="auth-tabs" role="tablist" aria-label="Opciones de acceso">
+        <button id="showLoginBtn" class="auth-tab active" type="button">Iniciar sesión</button>
+        <button id="showRegisterBtn" class="auth-tab" type="button">Crear cuenta</button>
+      </div>
+
+      <form id="loginForm" class="auth-form" autocomplete="off">
+        <label for="loginUserInput">
+          <span>Usuario</span>
+          <input id="loginUserInput" name="username" type="text" placeholder="Ej: jordy" minlength="3" required />
+        </label>
+
+        <label for="loginPasswordInput">
+          <span>Contraseña</span>
+          <input id="loginPasswordInput" name="password" type="password" placeholder="Ingresa tu contraseña"
+            minlength="4" required />
+        </label>
+
+        <button type="submit">Entrar</button>
+      </form>
+
+      <form id="registerForm" class="auth-form is-hidden" autocomplete="off">
+        <div class="profile-grid">
+          <label for="registerFirstNameInput">
+            <span>Nombre</span>
+            <input id="registerFirstNameInput" name="firstName" type="text" placeholder="Ej: Jordy" minlength="2"
+              required />
+          </label>
+
+          <label for="registerLastNameInput">
+            <span>Apellido</span>
+            <input id="registerLastNameInput" name="lastName" type="text" placeholder="Ej: Arauz" minlength="2"
+              required />
+          </label>
+        </div>
+
+        <label for="registerUserInput">
+          <span>Usuario</span>
+          <input id="registerUserInput" name="username" type="text" placeholder="Crea un usuario" minlength="3"
+            required />
+        </label>
+
+        <label for="registerPasswordInput">
+          <span>Contraseña</span>
+          <input id="registerPasswordInput" name="password" type="password" placeholder="Crea una contraseña"
+            minlength="4" required />
+        </label>
+
+        <label for="registerRoleInput">
+          <span>Tipo de cuenta</span>
+          <select id="registerRoleInput" name="role" required>
+            <option value="cliente" selected>Cliente</option>
+            <option value="vendedor">Vendedor</option>
+          </select>
+        </label>
+
+        <button type="submit">Crear cuenta</button>
+        <small>Los usuarios nuevos pueden registrarse como Cliente o Vendedor. El Admin predeterminado se mantiene
+          protegido.</small>
+      </form>
+    </div>
+  </section>
+
+  <header class="hero">
+    <nav class="nav">
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="assets/chaco-explorer-logo.png" alt="Logo Chaco Explorer" class="brand-logo">
+        </div>
+        <div>
+          <p class="brand-kicker">Agencia de viajes</p>
+          <h1>Chaco Explorer</h1>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a id="adminNavLink" class="ghost-button role-nav-link is-hidden" href="#adminPanel">Admin</a>
+        <a id="sellerNavLink" class="ghost-button role-nav-link is-hidden" href="#sellerPanel">Vendedor</a>
+        <a id="clientNavLink" class="ghost-button role-nav-link is-hidden" href="#clientPanel">Cliente</a>
+
+        <div id="userChip" class="user-chip" hidden>
+          <span>👤</span>
+          <strong id="userFullName">Invitado</strong>
+        </div>
+
+        <button id="resetProfileBtn" class="ghost-button compact" type="button" hidden>Cerrar sesión</button>
+        <button id="themeToggle" class="icon-button" type="button" aria-label="Cambiar tema">🌙</button>
+        <a class="ghost-button" href="#plan">Ver itinerario</a>
+      </div>
+    </nav>
+
+    <section class="hero-grid">
+      <div class="hero-copy">
+        <span id="welcomeMessage" class="personal-greeting">Bienvenido/a a Chaco Explorer.</span>
+        <span class="pill">Mapa + clima + rutas turísticas</span>
+        <h2>Explora el Gran Chaco y arma tu viaje en segundos.</h2>
+        <p>
+          Descubre destinos turísticos, revisa el clima, ubica lugares en el mapa y guarda tus favoritos en un
+          itinerario personalizado.
+        </p>
+
+        <form id="searchForm" class="search-card" autocomplete="off">
+          <label for="cityInput">Destino</label>
+          <div class="search-row">
+            <input id="cityInput" name="city" type="search" placeholder="Ej: Yacuiba, Villa Montes, Caraparí..."
+              required />
+            <button type="submit">Buscar</button>
+          </div>
+          <small>Usa datos de Open-Meteo, Wikipedia GeoSearch y OpenStreetMap.</small>
+        </form>
+      </div>
+
+      <aside class="hero-panel glass-card">
+        <div id="weatherAnimationLayer" class="weather-animation-layer" aria-hidden="true"></div>
+        <p class="muted">Destino seleccionado</p>
+        <h3 id="selectedCityName">Gran Chaco, Tarija</h3>
+
+        <div class="weather-main">
+          <div>
+            <span id="weatherIcon" class="weather-icon">⛅</span>
+          </div>
+          <div>
+            <strong id="currentTemp">--°C</strong>
+            <p id="weatherDescription">Cargando clima...</p>
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <span id="windValue">--</span>
+            <small>Viento km/h</small>
+          </div>
+          <div>
+            <span id="humidityValue">--</span>
+            <small>Humedad</small>
+          </div>
+          <div>
+            <span id="travelScore">--</span>
+            <small>Puntaje viaje</small>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </header>
+
+  <main class="container">
+    <section id="adminPanel" class="panel role-panel admin-role-panel is-hidden">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Panel administrador</p>
+          <h2>Administración general</h2>
+        </div>
+        <span class="role-badge">Acceso total</span>
+      </div>
+
+      <section class="role-stats-grid">
+        <article class="metric-card">
+          <span>👥</span>
+          <p>Usuarios</p>
+          <strong id="adminUsersMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>🧾</span>
+          <p>Ventas</p>
+          <strong id="adminSalesMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>💰</span>
+          <p>Total vendido</p>
+          <strong id="adminRevenueMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>🔐</span>
+          <p>Rol activo</p>
+          <strong>Admin</strong>
+        </article>
+      </section>
+
+      <section class="role-action-grid">
+        <button type="button" class="role-action-button" data-role-target="adminRegisterClientSection">👤 Registrar cliente</button>
+        <button type="button" class="role-action-button" data-role-target="adminRegisterSaleSection">🛒 Registrar venta</button>
+        <button type="button" class="role-action-button" data-role-target="adminUsersSection">👥 Ver usuarios</button>
+        <button type="button" class="role-action-button" data-role-target="adminSalesSection">🧾 Ver ventas</button>
+        <a class="role-action-button" href="#map">🗺️ Ir al mapa</a>
+        <a class="role-action-button" href="#plan">🧭 Ir al itinerario</a>
+      </section>
+
+      <div class="role-two-columns">
+        <article id="adminRegisterClientSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Nuevo cliente</p>
+              <h3>Registrar cliente</h3>
+            </div>
+          </div>
+
+          <form id="adminClientForm" class="sale-form" autocomplete="off">
+            <label for="adminClientFirstNameInput">
+              <span>Nombre</span>
+              <input id="adminClientFirstNameInput" type="text" placeholder="Ej: Carlos" minlength="2" required>
+            </label>
+
+            <label for="adminClientLastNameInput">
+              <span>Apellido</span>
+              <input id="adminClientLastNameInput" type="text" placeholder="Ej: Méndez" minlength="2" required>
+            </label>
+
+            <label for="adminClientUserInput">
+              <span>Usuario</span>
+              <input id="adminClientUserInput" type="text" placeholder="Ej: carlosm" minlength="3" required>
+            </label>
+
+            <label for="adminClientPasswordInput">
+              <span>Contraseña</span>
+              <input id="adminClientPasswordInput" type="password" placeholder="Contraseña del cliente" minlength="4"
+                required>
+            </label>
+
+            <button type="submit">Guardar cliente</button>
+          </form>
+        </article>
+
+        <article id="adminRegisterSaleSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Nueva venta</p>
+              <h3>Registrar venta</h3>
+            </div>
+          </div>
+
+          <form id="adminSaleForm" class="sale-form" autocomplete="off" novalidate>
+            <label for="adminSaleClientInput">
+              <span>Cliente</span>
+              <select id="adminSaleClientInput" required>
+                <option value="">Seleccionar cliente</option>
+              </select>
+            </label>
+
+            <label for="adminSalePackageInput">
+              <span>Paquete turístico</span>
+              <input id="adminSalePackageInput" type="text" placeholder="Ej: Ruta del Aguaragüe" minlength="5" required>
+            </label>
+
+            <label for="adminSaleAmountInput">
+              <span>Monto Bs</span>
+              <input id="adminSaleAmountInput" type="number" min="1" step="1" placeholder="Ej: 250" required>
+            </label>
+
+            <label for="adminSalePhoneInput">
+              <span>Teléfono / WhatsApp</span>
+              <input id="adminSalePhoneInput" type="tel" placeholder="Ej: +591 70000000 o +54 3870000000" required>
+            </label>
+
+            <label for="adminSaleEmailInput">
+              <span>Correo electrónico</span>
+              <input id="adminSaleEmailInput" type="email" placeholder="Ej: cliente@email.com" required>
+            </label>
+
+            <label for="adminSaleStatusInput">
+              <span>Estado</span>
+              <select id="adminSaleStatusInput">
+                <option value="Pagado">Pagado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Reservado">Reservado</option>
+              </select>
+            </label>
+
+            <label for="adminSalePaymentMethodInput">
+              <span>Forma de pago</span>
+              <select id="adminSalePaymentMethodInput" required>
+                <option value="">Seleccionar forma de pago</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia bancaria QR">Transferencia bancaria QR</option>
+                <option value="Tarjeta de débito o crédito">Tarjeta de débito o crédito</option>
+              </select>
+            </label>
+            <div class="qr-payment-box is-hidden">
+              <p>Escanea este QR para realizar el pago.</p>
+              <img src="assets/payment/qr-pago.png" alt="QR de pago Chaco Explorer">
+            </div>
+            <div class="card-payment-box is-hidden">
+              <label>
+                <span>Titular de la tarjeta</span>
+                <input class="card-holder-input" data-card-holder type="text" placeholder="Nombre completo">
+              </label>
+
+              <label>
+                <span>Número de tarjeta</span>
+                <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+              </label>
+
+              <div class="card-grid">
+                <label>
+                  <span>Vencimiento</span>
+                  <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA">
+                </label>
+
+                <label>
+                  <span>CVV</span>
+                  <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4" placeholder="123">
+                </label>
+              </div>
+
+              <small>Datos usados solo para simulación académica. No se guarda el CVV.</small>
+            </div>
+
+            <button type="submit">Registrar venta</button>
+          </form>
+        </article>
+      </div>
+
+      <div class="role-two-columns">
+        <article id="adminUsersSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Gestión</p>
+              <h3>Usuarios registrados</h3>
+            </div>
+          </div>
+          <div class="filter-tabs" data-users-filter-for="adminUsersList">
+            <button type="button" class="filter-tab active" data-user-role="all">Todos</button>
+            <button type="button" class="filter-tab" data-user-role="admin">Admin</button>
+            <button type="button" class="filter-tab" data-user-role="vendedor">Vendedores</button>
+            <button type="button" class="filter-tab" data-user-role="cliente">Clientes</button>
+          </div>
+          <div id="adminUsersList" class="admin-users-list"></div>
+        </article>
+
+        <article id="adminSalesSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Control</p>
+              <h3>Ventas registradas</h3>
+            </div>
+          </div>
+          <div class="filter-tabs" data-sales-filter-for="adminSalesList">
+            <button type="button" class="filter-tab active" data-sales-status="all">Todas</button>
+            <button type="button" class="filter-tab" data-sales-status="Pagado">Pagadas</button>
+            <button type="button" class="filter-tab" data-sales-status="Pendiente">Pendientes</button>
+            <button type="button" class="filter-tab" data-sales-status="Reservado">Reservadas</button>
+          </div>
+          <div id="adminSalesList" class="sales-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="sellerPanel" class="panel role-panel seller-role-panel is-hidden">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Panel vendedor</p>
+          <h2>Registro de clientes y ventas</h2>
+        </div>
+        <span class="role-badge">Vendedor</span>
+      </div>
+
+      <section class="role-stats-grid">
+        <article class="metric-card">
+          <span>👥</span>
+          <p>Usuarios visibles</p>
+          <strong id="sellerUsersMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>🧾</span>
+          <p>Ventas</p>
+          <strong id="sellerSalesMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>💰</span>
+          <p>Total vendido</p>
+          <strong id="sellerRevenueMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>🛒</span>
+          <p>Permiso</p>
+          <strong>Registrar</strong>
+        </article>
+      </section>
+
+      <section class="role-action-grid">
+        <button type="button" class="role-action-button" data-role-target="sellerRegisterClientSection">👤 Registrar cliente</button>
+        <button type="button" class="role-action-button" data-role-target="sellerRegisterSaleSection">🛒 Registrar venta</button>
+        <button type="button" class="role-action-button" data-role-target="sellerSalesSection">🧾 Ver ventas</button>
+        <button type="button" class="role-action-button" data-role-target="sellerUsersSection">👥 Ver usuarios</button>
+        <a class="role-action-button" href="#map">🗺️ Ir al mapa</a>
+        <a class="role-action-button" href="#plan">🧭 Ir al itinerario</a>
+      </section>
+
+      <div class="role-two-columns">
+        <article id="sellerRegisterClientSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Nuevo cliente</p>
+              <h3>Registrar cliente</h3>
+            </div>
+          </div>
+
+          <form id="sellerClientForm" class="sale-form" autocomplete="off">
+            <label for="sellerClientFirstNameInput">
+              <span>Nombre</span>
+              <input id="sellerClientFirstNameInput" type="text" placeholder="Ej: Carlos" minlength="2" required>
+            </label>
+
+            <label for="sellerClientLastNameInput">
+              <span>Apellido</span>
+              <input id="sellerClientLastNameInput" type="text" placeholder="Ej: Méndez" minlength="2" required>
+            </label>
+
+            <label for="sellerClientUserInput">
+              <span>Usuario</span>
+              <input id="sellerClientUserInput" type="text" placeholder="Ej: carlosm" minlength="3" required>
+            </label>
+
+            <label for="sellerClientPasswordInput">
+              <span>Contraseña</span>
+              <input id="sellerClientPasswordInput" type="password" placeholder="Contraseña del cliente" minlength="4"
+                required>
+            </label>
+
+            <button type="submit">Guardar cliente</button>
+          </form>
+        </article>
+
+        <article id="sellerRegisterSaleSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Nueva venta</p>
+              <h3>Registrar venta</h3>
+            </div>
+          </div>
+
+          <form id="saleForm" class="sale-form" autocomplete="off" novalidate>
+            <label for="saleClientInput">
+              <span>Cliente</span>
+              <select id="saleClientInput" required>
+                <option value="">Seleccionar cliente</option>
+              </select>
+            </label>
+
+            <label for="salePackageInput">
+              <span>Paquete turístico</span>
+              <input id="salePackageInput" type="text" placeholder="Ej: Ruta del Aguaragüe" minlength="5" required>
+            </label>
+
+            <label for="saleAmountInput">
+              <span>Monto Bs</span>
+              <input id="saleAmountInput" type="number" min="1" step="1" placeholder="Ej: 250" required>
+            </label>
+
+            <label for="salePhoneInput">
+              <span>Teléfono / WhatsApp</span>
+              <input id="salePhoneInput" type="tel" placeholder="Ej: +591 70000000 o +54 3870000000" required>
+            </label>
+
+            <label for="saleEmailInput">
+              <span>Correo electrónico</span>
+              <input id="saleEmailInput" type="email" placeholder="Ej: cliente@email.com" required>
+            </label>
+
+            <label for="saleStatusInput">
+              <span>Estado</span>
+              <select id="saleStatusInput">
+                <option value="Pagado">Pagado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Reservado">Reservado</option>
+              </select>
+            </label>
+
+            <label for="salePaymentMethodInput">
+              <span>Forma de pago</span>
+              <select id="salePaymentMethodInput" required>
+                <option value="">Seleccionar forma de pago</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia bancaria QR">Transferencia bancaria QR</option>
+                <option value="Tarjeta de débito o crédito">Tarjeta de débito o crédito</option>
+              </select>
+            </label>
+            <div class="qr-payment-box is-hidden">
+              <p>Escanea este QR para realizar el pago.</p>
+              <img src="assets/payment/qr-pago.png" alt="QR de pago Chaco Explorer">
+            </div>
+            <div class="card-payment-box is-hidden">
+              <label>
+                <span>Titular de la tarjeta</span>
+                <input class="card-holder-input" data-card-holder type="text" placeholder="Nombre completo">
+              </label>
+
+              <label>
+                <span>Número de tarjeta</span>
+                <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+              </label>
+
+              <div class="card-grid">
+                <label>
+                  <span>Vencimiento</span>
+                  <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA">
+                </label>
+
+                <label>
+                  <span>CVV</span>
+                  <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4" placeholder="123">
+                </label>
+              </div>
+
+              <small>Datos usados solo para simulación académica. No se guarda el CVV.</small>
+            </div>
+
+            <button type="submit">Registrar venta</button>
+          </form>
+        </article>
+      </div>
+
+      <div class="role-two-columns">
+        <article id="sellerSalesSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Consulta</p>
+              <h3>Ventas registradas</h3>
+            </div>
+          </div>
+          <div class="filter-tabs" data-sales-filter-for="sellerSalesList">
+            <button type="button" class="filter-tab active" data-sales-status="all">Todas</button>
+            <button type="button" class="filter-tab" data-sales-status="Pagado">Pagadas</button>
+            <button type="button" class="filter-tab" data-sales-status="Pendiente">Pendientes</button>
+            <button type="button" class="filter-tab" data-sales-status="Reservado">Reservadas</button>
+          </div>
+          <div id="sellerSalesList" class="sales-list"></div>
+        </article>
+
+        <article id="sellerUsersSection" class="role-box role-detail-section is-hidden">
+          <div class="section-title">
+            <div>
+              <p class="eyebrow">Solo lectura</p>
+              <h3>Usuarios registrados</h3>
+            </div>
+          </div>
+          <div class="filter-tabs" data-users-filter-for="sellerUsersList">
+            <button type="button" class="filter-tab active" data-user-role="all">Todos</button>
+            <button type="button" class="filter-tab" data-user-role="vendedor">Vendedores</button>
+            <button type="button" class="filter-tab" data-user-role="cliente">Clientes</button>
+          </div>
+          <div id="sellerUsersList" class="admin-users-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="clientPanel" class="panel role-panel client-role-panel is-hidden">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Panel cliente</p>
+          <h2>Mis compras y viajes</h2>
+        </div>
+        <span class="role-badge">Cliente</span>
+      </div>
+
+      <section class="role-stats-grid">
+        <article class="metric-card">
+          <span>🧭</span>
+          <p>Itinerario</p>
+          <strong id="clientPlanMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>🧾</span>
+          <p>Compras</p>
+          <strong id="clientPurchasesMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>💰</span>
+          <p>Total comprado</p>
+          <strong id="clientSpentMetric">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>🌿</span>
+          <p>Acceso</p>
+          <strong>Turismo</strong>
+        </article>
+      </section>
+
+      <section class="role-action-grid">
+        <button type="button" class="role-action-button" data-role-target="clientPurchasesSection">🧾 Ver mis compras</button>
+        <a class="role-action-button" href="#map">🗺️ Ir al mapa</a>
+        <a class="role-action-button" href="#plan">🧭 Ir al itinerario</a>
+      </section>
+
+      <article id="clientPurchasesSection" class="role-box role-detail-section is-hidden">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Historial</p>
+            <h3>Mis compras personales</h3>
+          </div>
+        </div>
+        <div class="filter-tabs" data-sales-filter-for="clientPurchasesList">
+          <button type="button" class="filter-tab active" data-sales-status="all">Todas</button>
+          <button type="button" class="filter-tab" data-sales-status="Pagado">Pagadas</button>
+          <button type="button" class="filter-tab" data-sales-status="Pendiente">Pendientes</button>
+          <button type="button" class="filter-tab" data-sales-status="Reservado">Reservadas</button>
+        </div>
+        <div id="clientPurchasesList" class="sales-list"></div>
+      </article>
+    </section>
+
+    <section class="summary-grid" aria-label="Resumen del destino">
+      <article class="metric-card">
+        <span>📍</span>
+        <p>País</p>
+        <strong id="countryMetric">--</strong>
+      </article>
+      <article class="metric-card">
+        <span>🗺️</span>
+        <p>Lugares encontrados</p>
+        <strong id="placesMetric">--</strong>
+      </article>
+      <article class="metric-card">
+        <span>🌡️</span>
+        <p>Sensación</p>
+        <strong id="feelMetric">--</strong>
+      </article>
+      <article class="metric-card">
+        <span>🧭</span>
+        <p>Recomendación</p>
+        <strong id="adviceMetric">--</strong>
+      </article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel map-panel">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Explorador</p>
+            <h2>Mapa interactivo</h2>
+          </div>
+
+          <div class="nav-actions">
+            <button id="geoLocateBtn" class="small-button" type="button">Geolocalizar</button>
+            <button id="centerMapBtn" class="small-button" type="button">Centrar mapa</button>
+          </div>
+        </div>
+
+        <div id="map"></div>
+      </article>
+
+      <article class="panel forecast-panel">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Clima</p>
+            <h2>Pronóstico de 5 días</h2>
+          </div>
+        </div>
+
+        <canvas id="forecastChart" height="180"></canvas>
+        <div id="forecastList" class="forecast-list"></div>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel places-panel">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Descubre</p>
+            <h2>Lugares cercanos</h2>
+          </div>
+
+          <select id="radiusSelect" class="select-input" aria-label="Radio de búsqueda">
+            <option value="3000">3 km</option>
+            <option value="8000" selected>8 km</option>
+            <option value="15000">15 km</option>
+            <option value="30000">30 km</option>
+          </select>
+        </div>
+
+        <div id="placesList" class="places-list"></div>
+      </article>
+
+      <aside id="plan" class="panel itinerary-panel">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Planificador</p>
+            <h2>Itinerario guardado</h2>
+          </div>
+          <button id="clearPlanBtn" class="small-button danger" type="button">Limpiar</button>
+        </div>
+
+        <div id="itineraryList" class="itinerary-list empty-state">
+          Aún no agregaste lugares al itinerario.
+        </div>
+
+        <div id="checkoutBox" class="checkout-box is-hidden">
+          <div>
+            <p class="eyebrow" id="checkoutEyebrow">Compra del viaje</p>
+            <h3 id="checkoutTitle">Reserva tu itinerario</h3>
+            <span id="checkoutSummary">Selecciona lugares para continuar.</span>
+          </div>
+
+          <label id="checkoutClientLabel" class="checkout-client-label is-hidden" for="checkoutClientInput">
+            <span>Cliente</span>
+            <select id="checkoutClientInput">
+              <option value="">Seleccionar cliente</option>
+            </select>
+          </label>
+
+          <label class="checkout-client-label" for="checkoutPhoneInput">
+            <span>Teléfono / WhatsApp</span>
+            <input id="checkoutPhoneInput" type="tel">
+          </label>
+
+          <label class="checkout-client-label" for="checkoutEmailInput">
+            <span>Correo electrónico</span>
+            <input id="checkoutEmailInput" type="email">
+          </label>
+
+          <label class="checkout-client-label" for="checkoutStatusInput">
+            <span>Estado</span>
+            <select id="checkoutStatusInput">
+              <option value="Pagado">Pagado</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Reservado" selected>Reservado</option>
+            </select>
+          </label>
+
+          <label class="checkout-client-label" for="checkoutPaymentMethodInput">
+            <span>Forma de pago</span>
+            <select id="checkoutPaymentMethodInput">
+              <option value="">Seleccionar forma de pago</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia bancaria QR">Transferencia bancaria QR</option>
+              <option value="Tarjeta de débito o crédito">Tarjeta de débito o crédito</option>
+            </select>
+          </label>
+          <div class="qr-payment-box is-hidden">
+            <p>Escanea este QR para realizar el pago.</p>
+            <img src="assets/payment/qr-pago.png" alt="QR de pago Chaco Explorer">
+          </div>
+          <div class="card-payment-box is-hidden">
+            <label>
+              <span>Titular de la tarjeta</span>
+              <input class="card-holder-input" data-card-holder type="text" placeholder="Nombre completo">
+            </label>
+
+            <label>
+              <span>Número de tarjeta</span>
+              <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+            </label>
+
+            <div class="card-grid">
+              <label>
+                <span>Vencimiento</span>
+                <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA">
+              </label>
+
+              <label>
+                <span>CVV</span>
+                <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4" placeholder="123">
+              </label>
+            </div>
+
+            <small>Datos usados solo para simulación académica. No se guarda el CVV.</small>
+          </div>
+
+          <button id="checkoutActionBtn" type="button" disabled>Comprar itinerario</button>
+        </div>
+
+        <div class="budget-card">
+          <h3>Estimador básico</h3>
+
+          <div class="budget-row">
+            <label for="daysInput">Días</label>
+            <input id="daysInput" type="number" min="1" max="30" value="3" />
+          </div>
+
+          <div class="budget-row">
+            <label for="styleSelect">Estilo</label>
+            <select id="styleSelect">
+              <option value="30">Económico</option>
+              <option value="60" selected>Medio</option>
+              <option value="100">Cómodo</option>
+            </select>
+          </div>
+
+          <div class="budget-total">
+            <span>Total estimado</span>
+            <strong id="budgetTotal">--</strong>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="assets/chaco-explorer-logo.png" alt="Logo Chaco Explorer" class="footer-logo">
+        <div>
+          <p class="footer-kicker">Proyecto académico</p>
+          <h2>Chaco Explorer</h2>
+          <span class="footer-subtitle">Agencia de Viajes Inteligente del Gran Chaco</span>
+        </div>
+      </div>
+
+      <div class="footer-info">
+        <p>Desarrollado por</p>
+        <strong>Jordy Arauz Fernandez</strong>
+        <span>© 2026 | Todos los derechos reservados</span>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="qrModal" class="qr-modal is-hidden">
+    <button id="closeQrModalBtn" class="qr-modal-close" type="button">×</button>
+    <img id="qrModalImage" src="assets/payment/qr-pago.png" alt="QR de pago ampliado">
+  </div>
+
+  <div id="invoiceModal" class="invoice-modal is-hidden">
+    <article id="invoiceCard" class="invoice-card">
+      <button id="closeInvoiceModalBtn" class="invoice-close" type="button">×</button>
+      <div id="invoiceContent"></div>
+    </article>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>
