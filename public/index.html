@@ -20,7 +20,43 @@
   <div class="background-shape shape-one"></div>
   <div class="background-shape shape-two"></div>
 
+  <div id="appWeatherScene" class="app-weather-scene app-weather-neutral" aria-hidden="true"></div>
+
   <section id="authScreen" class="welcome-screen" aria-labelledby="authTitle">
+    <div class="tourism-login-scene" aria-hidden="true">
+      <div class="tourism-sky-glow glow-one"></div>
+      <div class="tourism-sky-glow glow-two"></div>
+
+      <div class="tourism-sun"></div>
+
+      <div class="tourism-cloud cloud-one"></div>
+      <div class="tourism-cloud cloud-two"></div>
+      <div class="tourism-cloud cloud-three"></div>
+      <div class="tourism-cloud cloud-four"></div>
+
+      <div class="tourism-birds birds-one">⌁⌁</div>
+      <div class="tourism-birds birds-two">⌁⌁⌁</div>
+
+      <div class="tourism-compass">🧭</div>
+      <div class="tourism-plane">✈️</div>
+      <div class="tourism-pin pin-one">📍</div>
+      <div class="tourism-pin pin-two">📍</div>
+
+      <div class="tourism-route">
+        <span class="route-dot route-dot-one"></span>
+        <span class="route-dot route-dot-two"></span>
+        <span class="route-dot route-dot-three"></span>
+        <span class="route-dot route-dot-four"></span>
+      </div>
+
+      <div class="tourism-mountains">
+        <span class="mountain mountain-one"></span>
+        <span class="mountain mountain-two"></span>
+        <span class="mountain mountain-three"></span>
+        <span class="mountain mountain-four"></span>
+      </div>
+    </div>
+
     <div class="welcome-card auth-card">
       <div class="auth-logo-box">
         <img src="assets/chaco-explorer-logo.png" alt="Logo Chaco Explorer" class="auth-logo">
@@ -210,8 +246,10 @@
       </section>
 
       <section class="role-action-grid">
-        <button type="button" class="role-action-button" data-role-target="adminRegisterClientSection">👤 Registrar cliente</button>
-        <button type="button" class="role-action-button" data-role-target="adminRegisterSaleSection">🛒 Registrar venta</button>
+        <button type="button" class="role-action-button" data-role-target="adminRegisterClientSection">👤 Registrar
+          cliente</button>
+        <button type="button" class="role-action-button" data-role-target="adminRegisterSaleSection">🛒 Registrar
+          venta</button>
         <button type="button" class="role-action-button" data-role-target="adminUsersSection">👥 Ver usuarios</button>
         <button type="button" class="role-action-button" data-role-target="adminSalesSection">🧾 Ver ventas</button>
         <a class="role-action-button" href="#map">🗺️ Ir al mapa</a>
@@ -319,18 +357,21 @@
 
               <label>
                 <span>Número de tarjeta</span>
-                <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+                <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19"
+                  placeholder="0000 0000 0000 0000">
               </label>
 
               <div class="card-grid">
                 <label>
                   <span>Vencimiento</span>
-                  <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA">
+                  <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5"
+                    placeholder="MM/AA">
                 </label>
 
                 <label>
                   <span>CVV</span>
-                  <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4" placeholder="123">
+                  <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4"
+                    placeholder="123">
                 </label>
               </div>
 
@@ -410,8 +451,10 @@
       </section>
 
       <section class="role-action-grid">
-        <button type="button" class="role-action-button" data-role-target="sellerRegisterClientSection">👤 Registrar cliente</button>
-        <button type="button" class="role-action-button" data-role-target="sellerRegisterSaleSection">🛒 Registrar venta</button>
+        <button type="button" class="role-action-button" data-role-target="sellerRegisterClientSection">👤 Registrar
+          cliente</button>
+        <button type="button" class="role-action-button" data-role-target="sellerRegisterSaleSection">🛒 Registrar
+          venta</button>
         <button type="button" class="role-action-button" data-role-target="sellerSalesSection">🧾 Ver ventas</button>
         <button type="button" class="role-action-button" data-role-target="sellerUsersSection">👥 Ver usuarios</button>
         <a class="role-action-button" href="#map">🗺️ Ir al mapa</a>
@@ -519,18 +562,21 @@
 
               <label>
                 <span>Número de tarjeta</span>
-                <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+                <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19"
+                  placeholder="0000 0000 0000 0000">
               </label>
 
               <div class="card-grid">
                 <label>
                   <span>Vencimiento</span>
-                  <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA">
+                  <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5"
+                    placeholder="MM/AA">
                 </label>
 
                 <label>
                   <span>CVV</span>
-                  <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4" placeholder="123">
+                  <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4"
+                    placeholder="123">
                 </label>
               </div>
 
@@ -609,7 +655,8 @@
       </section>
 
       <section class="role-action-grid">
-        <button type="button" class="role-action-button" data-role-target="clientPurchasesSection">🧾 Ver mis compras</button>
+        <button type="button" class="role-action-button" data-role-target="clientPurchasesSection">🧾 Ver mis
+          compras</button>
         <a class="role-action-button" href="#map">🗺️ Ir al mapa</a>
         <a class="role-action-button" href="#plan">🧭 Ir al itinerario</a>
       </section>
@@ -770,18 +817,21 @@
 
             <label>
               <span>Número de tarjeta</span>
-              <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+              <input class="card-number-input" data-card-number type="text" inputmode="numeric" maxlength="19"
+                placeholder="0000 0000 0000 0000">
             </label>
 
             <div class="card-grid">
               <label>
                 <span>Vencimiento</span>
-                <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA">
+                <input class="card-expiry-input" data-card-expiry type="text" inputmode="numeric" maxlength="5"
+                  placeholder="MM/AA">
               </label>
 
               <label>
                 <span>CVV</span>
-                <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4" placeholder="123">
+                <input class="card-cvv-input" data-card-cvv type="password" inputmode="numeric" maxlength="4"
+                  placeholder="123">
               </label>
             </div>
 

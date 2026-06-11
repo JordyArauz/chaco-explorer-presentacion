@@ -123,6 +123,7 @@ const ui = {
   currentTemp: document.querySelector("#currentTemp"),
   weatherDescription: document.querySelector("#weatherDescription"),
   weatherAnimationLayer: document.querySelector("#weatherAnimationLayer"),
+  appWeatherScene: document.querySelector("#appWeatherScene"),
   windValue: document.querySelector("#windValue"),
   humidityValue: document.querySelector("#humidityValue"),
   travelScore: document.querySelector("#travelScore"),
@@ -2157,6 +2158,7 @@ function updateWeatherUI(city, weather) {
   ui.adviceMetric.textContent = weather.advice;
 
   updateWeatherAnimation(city.displayName || city.name, weather.currentInfo.label);
+  updateAppWeatherScene(city.displayName || city.name, weather.currentInfo.label);
   updateBudget();
 }
 
@@ -2246,6 +2248,145 @@ function clearWeatherAnimation() {
 
   ui.weatherAnimationLayer.replaceChildren();
   ui.weatherAnimationLayer.dataset.weatherType = "none";
+}
+
+
+function updateAppWeatherScene(cityName, weatherText) {
+  if (!ui.appWeatherScene) return;
+
+  const type = getWeatherAnimationType(weatherText) || "neutral";
+
+  clearAppWeatherScene();
+
+  ui.appWeatherScene.dataset.city = cityName || "";
+  ui.appWeatherScene.dataset.weatherText = weatherText || "";
+  ui.appWeatherScene.dataset.weatherType = type;
+  ui.appWeatherScene.classList.remove(
+    "app-weather-rain",
+    "app-weather-sunny",
+    "app-weather-cloudy",
+    "app-weather-neutral"
+  );
+  ui.appWeatherScene.classList.add(`app-weather-${type}`);
+
+  if (type === "rain") {
+    renderAppRainScene();
+  } else if (type === "sunny") {
+    renderAppSunnyScene();
+  } else if (type === "cloudy") {
+    renderAppCloudyScene();
+  } else {
+    renderAppNeutralScene();
+  }
+}
+
+function clearAppWeatherScene() {
+  if (!ui.appWeatherScene) return;
+  ui.appWeatherScene.replaceChildren();
+}
+
+function renderAppRainScene() {
+  if (!ui.appWeatherScene) return;
+
+  const cloudLayer = document.createElement("div");
+  cloudLayer.className = "app-cloud-field app-rain-cloud-field";
+
+  for (let index = 0; index < 5; index += 1) {
+    const cloud = document.createElement("span");
+    cloud.className = `app-cloud app-rain-cloud app-cloud-${index + 1}`;
+    cloudLayer.appendChild(cloud);
+  }
+
+  const rainField = document.createElement("div");
+  rainField.className = "app-rain-field";
+
+  for (let index = 0; index < 64; index += 1) {
+    const drop = document.createElement("span");
+    drop.className = "app-rain-drop";
+    drop.style.left = `${(index * 3.7) % 100}%`;
+    drop.style.animationDelay = `${(index % 12) * -0.16}s`;
+    drop.style.animationDuration = `${0.9 + (index % 7) * 0.11}s`;
+    drop.style.opacity = `${0.28 + (index % 5) * 0.09}`;
+    rainField.appendChild(drop);
+  }
+
+  const mist = document.createElement("div");
+  mist.className = "app-rain-mist";
+
+  ui.appWeatherScene.append(cloudLayer, rainField, mist);
+}
+
+function renderAppSunnyScene() {
+  if (!ui.appWeatherScene) return;
+
+  const sun = document.createElement("div");
+  sun.className = "app-sunny-sun";
+  sun.innerHTML = `
+    <span class="app-sunny-glow"></span>
+    <span class="app-sunny-rays"></span>
+    <span class="app-sunny-core"></span>
+  `;
+
+  const orbLayer = document.createElement("div");
+  orbLayer.className = "app-sunny-orbs";
+
+  for (let index = 0; index < 5; index += 1) {
+    const orb = document.createElement("span");
+    orb.className = `app-sun-orb app-sun-orb-${index + 1}`;
+    orbLayer.appendChild(orb);
+  }
+
+  const route = document.createElement("div");
+  route.className = "app-sunny-route";
+  route.innerHTML = `
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  `;
+
+  ui.appWeatherScene.append(sun, orbLayer, route);
+}
+
+function renderAppCloudyScene() {
+  if (!ui.appWeatherScene) return;
+
+  const cloudLayer = document.createElement("div");
+  cloudLayer.className = "app-cloud-field app-cloudy-field";
+
+  for (let index = 0; index < 8; index += 1) {
+    const cloud = document.createElement("span");
+    cloud.className = `app-cloud app-cloudy-cloud app-cloud-${index + 1}`;
+    cloudLayer.appendChild(cloud);
+  }
+
+  const haze = document.createElement("div");
+  haze.className = "app-cloudy-haze";
+
+  ui.appWeatherScene.append(cloudLayer, haze);
+}
+
+function renderAppNeutralScene() {
+  if (!ui.appWeatherScene) return;
+
+  const neutral = document.createElement("div");
+  neutral.className = "app-neutral-tourism";
+  neutral.innerHTML = `
+    <div class="app-neutral-cloud app-neutral-cloud-one"></div>
+    <div class="app-neutral-cloud app-neutral-cloud-two"></div>
+    <div class="app-neutral-route">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="app-neutral-mountains">
+      <span class="app-neutral-mountain app-neutral-mountain-one"></span>
+      <span class="app-neutral-mountain app-neutral-mountain-two"></span>
+      <span class="app-neutral-mountain app-neutral-mountain-three"></span>
+    </div>
+  `;
+
+  ui.appWeatherScene.appendChild(neutral);
 }
 
 function updateCityMap(city, icon = "🌵") {
